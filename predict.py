@@ -11,6 +11,7 @@ import dlib
 import cv2
 import os
 from skimage.feature import hog
+from collections import defaultdict
 
 from parameters import DATASET, TRAINING, NETWORK, VIDEO_PREDICTOR
 from model import build_model
@@ -44,7 +45,7 @@ def sliding_hog_windows(image):
         for x in range(0, NETWORK.input_size, window_step):
             window = image[y:y+window_size, x:x+window_size]
             hog_windows.extend(hog(window, orientations=8, pixels_per_cell=(8, 8),
-                                            cells_per_block=(1, 1), visualise=False))
+                                            cells_per_block=(1, 1), visualize=False))
     return hog_windows
 
 def predict(image, model, shape_predictor=None):
@@ -60,7 +61,7 @@ def predict(image, model, shape_predictor=None):
             features = np.concatenate((face_landmarks, hog_features))
         else:
             hog_features, _ = hog(image, orientations=8, pixels_per_cell=(16, 16),
-                                    cells_per_block=(1, 1), visualise=True)
+                                    cells_per_block=(1, 1), visualize=True)
             hog_features = np.asarray(hog_features)
             face_landmarks = face_landmarks.flatten()
             features = np.concatenate((face_landmarks, hog_features))
@@ -83,8 +84,27 @@ def get_emotion(label):
 # parse arg to see if we need to launch training now or not yet
 parser = argparse.ArgumentParser()
 parser.add_argument("-i", "--image", help="Image file to predict")
+parser.add_argument("-d", "--dir", help="Image directory to predict", default="./test")
 args = parser.parse_args()
-if args.image:
+if args.dir:
+    preds = defaultdict(lambda: "happy")
+    model = load_model()
+    for img in os.listdir(args.dir):
+        if os.path.isfile(os.path.join(args.dir, img)) and img.endswith(".jpg"):
+            image = cv2.imread(os.path.join(args.dir, img), 0)
+            shape_predictor = dlib.shape_predictor(DATASET.shape_predictor_path)
+            start_time = time.time()
+            emotion, confidence = predict(image, model, shape_predictor)
+            total_time = time.time() - start_time
+            preds[img] = emotion
+            print( "Prediction: {0} (confidence: {1:.1f}%)".format(emotion, confidence*100))
+            # print( "time: {0:.1f} sec".format(total_time))
+        else:
+            print( "Error: file '{}' not found".format(img))
+    with open("prediction.csv", "w") as fout:
+        for img in preds.keys():
+            print("%s,%s" % (img, preds[img]), file=fout)
+elif args.image:
     if os.path.isfile(args.image):
         model = load_model()
         image = cv2.imread(args.image, 0)

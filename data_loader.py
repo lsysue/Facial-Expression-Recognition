@@ -11,11 +11,13 @@ def load_data(validation=False, test=False):
     validation_dict = dict()
     test_dict = dict()
 
-    if DATASET.name == "Fer2013":
+    if DATASET.name == "FerDataset":
 
         # load train set
         data_dict['X'] = np.load(DATASET.train_folder + '/images.npy')
+        print("INFO | training data size before:", data_dict['X'].shape)
         data_dict['X'] = data_dict['X'].reshape([-1, NETWORK.input_size, NETWORK.input_size, 1])
+        print("INFO | training data size after:", data_dict['X'].shape)
         if NETWORK.use_landmarks:
             data_dict['X2'] = np.load(DATASET.train_folder + '/landmarks.npy')
         if NETWORK.use_hog_and_landmarks:
@@ -23,6 +25,7 @@ def load_data(validation=False, test=False):
             data_dict['X2'] = np.array([x.flatten() for x in data_dict['X2']])
             data_dict['X2'] = np.concatenate((data_dict['X2'], np.load(DATASET.train_folder + '/hog_features.npy')), axis=1)
         data_dict['Y'] = np.load(DATASET.train_folder + '/labels.npy')
+        print("INFO | training label size:", data_dict['Y'].shape)
         if DATASET.trunc_trainset_to > 0:
             data_dict['X'] = data_dict['X'][0:DATASET.trunc_trainset_to, :, :]
             if NETWORK.use_landmarks and NETWORK.use_hog_and_landmarks:
@@ -34,7 +37,9 @@ def load_data(validation=False, test=False):
         if validation:
             # load validation set
             validation_dict['X'] = np.load(DATASET.validation_folder + '/images.npy')
+            print("INFO | validation data size before:", validation_dict['X'].shape)
             validation_dict['X'] = validation_dict['X'].reshape([-1, NETWORK.input_size, NETWORK.input_size, 1])
+            print("INFO | validation data size after:", validation_dict['X'].shape)
             if NETWORK.use_landmarks:
                 validation_dict['X2'] = np.load(DATASET.validation_folder + '/landmarks.npy')
             if NETWORK.use_hog_and_landmarks:
@@ -42,6 +47,7 @@ def load_data(validation=False, test=False):
                 validation_dict['X2'] = np.array([x.flatten() for x in validation_dict['X2']])
                 validation_dict['X2'] = np.concatenate((validation_dict['X2'], np.load(DATASET.validation_folder + '/hog_features.npy')), axis=1)
             validation_dict['Y'] = np.load(DATASET.validation_folder + '/labels.npy')
+            print("INFO | validation label size:", validation_dict['Y'].shape)
             if DATASET.trunc_validationset_to > 0:
                 validation_dict['X'] = validation_dict['X'][0:DATASET.trunc_validationset_to, :, :]
                 if NETWORK.use_landmarks and NETWORK.use_hog_and_landmarks:

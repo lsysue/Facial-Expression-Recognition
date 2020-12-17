@@ -5,10 +5,10 @@ Sep, 1st, 2016
 import os
 
 class Dataset:
-    name = 'Fer2013'
-    train_folder = 'fer2013_features/Training'
-    validation_folder = 'fer2013_features/PublicTest'
-    test_folder = 'fer2013_features/PrivateTest'
+    name = 'FerDataset'
+    train_folder = './all_features/train'
+    validation_folder = './all_features/validation'
+    test_folder = './test'
     shape_predictor_path='shape_predictor_68_face_landmarks.dat'
     trunc_trainset_to = -1  # put the number of train images to use (-1 = all images of the train set)
     trunc_validationset_to = -1
@@ -27,12 +27,21 @@ class Network:
     use_batchnorm_after_fully_connected_layers = False
 
 class Hyperparams:
+    """ original hyperparams
     keep_prob = 0.956   # dropout = 1 - keep_prob
     learning_rate = 0.016
     learning_rate_decay = 0.864
     decay_step = 50
     optimizer = 'momentum'  # {'momentum', 'adam', 'rmsprop', 'adagrad', 'adadelta'}
-    optimizer_param = 0.95   # momentum value for Momentum optimizer, or beta1 value for Adam
+    optimizer_param = 0.95 # momentum value for Momentum optimizer, or beta1 value for Adam
+    """   
+    keep_prob =  0.810152   # dropout = 1 - keep_prob
+    learning_rate = 0.036996
+    learning_rate_decay = 0.879152
+    decay_step = 50
+    optimizer = 'momentum'  # {'momentum', 'adam', 'rmsprop', 'adagrad', 'adadelta'}
+    optimizer_param = 0.958624
+
 
 class Training:
     batch_size = 128
@@ -48,7 +57,7 @@ class Training:
     save_model_path = "best_model/saved_model.bin"
 
 class VideoPredictor:
-    emotions = ["Angry", "Disgust", "Fear", "Happy", "Sad", "Surprise", "Neutral"]
+    emotions = ["angry", "disgust", "fear", "happy", "sad", "surprise", "neutral"]
     print_emotions = False
     camera_source = 0
     face_detection_classifier = "lbpcascade_frontalface.xml"
